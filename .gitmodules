@@ -1,0 +1,3 @@
+[submodule "lib/sbbs"]
+	path = lib/sbbs
+	url = https://github.com/RexMachinarum/sbbs
