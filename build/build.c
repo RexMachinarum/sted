@@ -18,15 +18,21 @@ extern struct sbbsModule** stedAddModuleToNullTerminatedList     (struct sbbsMod
 int main(int argc, char* argv[]) {
 
 	size_t i = 0;
-	static struct sbbsModule** os_dependent_modules = NULL;
-	static struct sbbsModule* main_module = NULL;
-	static struct sbbsModule* tmp_module = NULL; /* use this any time that you'd like to */
+	struct sbbsModule** os_dependent_modules = NULL;
+	struct sbbsModule* main_module = NULL;
+	struct sbbsModule* log_module = NULL;
+	struct sbbsModule* tmp_module = NULL; /* use this any time that you'd like to */
 
 	/* main module */
 	main_module = sbbsCreateModule("main");
 	sbbsAddModuleSource(main_module, "../src/main.c", NULL);
 
-	/* terminal module */
+	/* logging module */
+	log_module = sbbsCreateModule("log");
+	sbbsAddModuleSource(log_module, "../src/log.c", NULL);
+	sbbsAddModuleDependency(main_module, log_module);
+
+	/* optional modules */
 	#ifdef __GLIBC__
 		tmp_module = sbbsCreateModule("glibc-terminal");
 		sbbsAddModuleSource(tmp_module, "../src/linux/terminal-input.c", NULL);
