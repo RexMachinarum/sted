@@ -1,6 +1,8 @@
 #ifndef EDITOR_TERMINAL
 #define EDITOR_TERMINAL
 
+/* all of this stuff is for drawing */
+
 typedef unsigned short stedTermDimension;
 
 enum stedTerminalColor {
@@ -30,5 +32,18 @@ extern void              stedClearTerminal          (void);
 extern void              stedDrawTerminal           (void);
 extern void              stedDrawCharacter          (stedTermDimension x, stedTermDimension y, const char to_draw, enum stedTerminalColor foreground_color, enum stedTerminalColor background_color, enum stedTerminalStyle style);
 extern void              stedDrawString             (stedTermDimension x, stedTermDimension y, const char* to_draw, enum stedTerminalColor foreground_color, enum stedTerminalColor background_color, enum stedTerminalStyle style);
+
+/* All the stuff below is for input processing */
+
+#include <stdlib.h>
+
+extern void             stedSetupTerminalInput    (void);
+extern void             stedCleanupTerminalInput  (void);
+/*
+ * returns an array of character which represent the input that was recieved from the user.
+ * 'len_ref' will be set to the length of this array.
+ * You MUST free this memory.
+*/
+extern const int* const stedGetTerminalInput      (size_t* const len_ref); 
 
 #endif

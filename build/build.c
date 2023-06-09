@@ -29,7 +29,8 @@ int main(int argc, char* argv[]) {
 	/* terminal module */
 	#ifdef __GLIBC__
 		tmp_module = sbbsCreateModule("glibc-terminal");
-		sbbsAddModuleSource(tmp_module, "../src/linux/terminal.c", NULL);
+		sbbsAddModuleSource(tmp_module, "../src/linux/terminal-input.c", NULL);
+		sbbsAddModuleSource(tmp_module, "../src/linux/terminal-output.c", NULL);
 		os_dependent_modules = stedAddModuleToNullTerminatedList(os_dependent_modules, tmp_module);
 	#else
 		#error "This platform is not supported by Sted. Please get in touch with the devs to see how long or if this platform will be supported"

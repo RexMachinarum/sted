@@ -1,11 +1,12 @@
+#include "../../lib/sted/terminal.h"
 
-#ifdef __GLIBC__
+#include <stdio.h>
+#include <assert.h>
+
+#ifndef __GLIBC__
 	#error "The functions defined in this file only operate on operating systems which have GLibC"
 #else
 
-#include "../../lib/sted/terminal.h"
-#include <stdio.h>
-#include <assert.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 
@@ -15,7 +16,9 @@ static int IsTTY() {
 
 	f = fopen(ctermid(NULL), "r");
 	status = isatty(fileno(f));
-	fclose(f);
+	if (f != NULL) {
+		fclose(f);
+	}
 
 	return status;
 }
