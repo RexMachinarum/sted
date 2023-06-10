@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
 	struct sbbsModule** os_dependent_modules = NULL;
 	struct sbbsModule* main_module = NULL;
 	struct sbbsModule* log_module = NULL;
+	struct sbbsModule* file_module = NULL;
 	struct sbbsModule* tmp_module = NULL; /* use this any time that you'd like to */
 
 	/* main module */
@@ -31,6 +32,11 @@ int main(int argc, char* argv[]) {
 	log_module = sbbsCreateModule("log");
 	sbbsAddModuleSource(log_module, "../src/log.c", NULL);
 	sbbsAddModuleDependency(main_module, log_module);
+
+	/* file module */
+	file_module = sbbsCreateModule("file");
+	sbbsAddModuleSource(file_module, "../src/file.c", NULL);
+	sbbsAddModuleDependency(main_module, file_module);
 
 	/* optional modules */
 	#ifdef __GLIBC__
