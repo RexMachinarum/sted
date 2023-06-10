@@ -13,6 +13,29 @@
 
 static FILE* log_file = NULL;
 
+char* stedCreateLogString (const int num_parts, ...) {
+	int i = 0;
+	va_list args;
+	char* final_msg = NULL;
+
+	va_start(args, num_parts);
+
+	for (i = 0; i < num_parts; i++) {
+		char* msg_part = va_arg(args, char*);
+		if (final_msg == NULL) {
+			final_msg = calloc(strlen(msg_part) + 1, sizeof(char));
+		} else {
+			const size_t MSG_LEN = strlen(final_msg) + strlen(msg_part) + 1;
+			final_msg = realloc(final_msg, MSG_LEN * sizeof(char));
+			final_msg[MSG_LEN-1] = '\0';
+		}
+		strcat(final_msg, msg_part);
+	}
+
+	va_end(args);
+	return final_msg;
+}
+
 void stedSetupLogging(void) {
 	#ifdef __GLIBC__
 	{
