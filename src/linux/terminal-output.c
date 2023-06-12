@@ -11,16 +11,7 @@
 #include <sys/ioctl.h>
 
 static int IsTTY() {
-	FILE* f = NULL;
-	int status = 0;
-
-	f = fopen(ctermid(NULL), "r");
-	status = isatty(fileno(f));
-	if (f != NULL) {
-		fclose(f);
-	}
-
-	return status;
+	return isatty(fileno(stdout));
 }
 
 void stedSetupTerminalDrawing(void) {
