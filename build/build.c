@@ -13,9 +13,6 @@
 #include <string.h>
 #include "../lib/sbbs/sbbs.h"
 
-extern size_t              stedGetNullTerminatedModuleListLength (struct sbbsModule** list); 
-extern struct sbbsModule** stedAddModuleToNullTerminatedList     (struct sbbsModule** list, struct sbbsModule* module); /* returns a pointer to the start of the list */
-
 enum stedBuildMode {
 	stedBuildMode_Release,
 	stedBuildMode_Debug
@@ -24,12 +21,11 @@ enum stedBuildMode {
 int main(int argc, char* argv[]) {
 
 	size_t i = 0;
-	struct sbbsModule** os_dependent_modules = NULL;
-	struct sbbsModule* main_module = NULL;
-	struct sbbsModule* log_module = NULL;
-	struct sbbsModule* file_module = NULL;
-	struct sbbsModule* rope_module = NULL;
-	struct sbbsModule* tmp_module = NULL; /* use this any time that you'd like to */
+	struct sbbsModule
+		*main_module = NULL,
+		*general_module = NULL,
+		*terminal_module = NULL,
+		*tmp_module = NULL;
 	char* universal_cl_args = NULL;
 	enum stedBuildMode build_mode;
 
@@ -50,17 +46,17 @@ int main(int argc, char* argv[]) {
 
 	/* force C89 compatibility if using gcc */
 	if (sbbsWhichCompiler() == sbbsCompilerType_gcc) {
-		const char* release_args = "-std=c89 -O2";
-		const char* debug_args = "-ggdb";
-		size_t cl_args_len = strlen(release_args) + 1;
+		const char* RELEASE_ARGS = "-std=c89 -O2";
+		const char* DEBUG_ARGS = "-ggdb";
+		size_t cl_args_len = strlen(RELEASE_ARGS) + 1;
 		if (build_mode == stedBuildMode_Debug) {
-			cl_args_len += strlen(debug_args) + 1;
+			cl_args_len += strlen(DEBUG_ARGS) + 1;
 		}
 		universal_cl_args = calloc(cl_args_len + 1, sizeof(char));
-		strcat(universal_cl_args, release_args);
+		strcat(universal_cl_args, RELEASE_ARGS);
 		strcat(universal_cl_args, " ");
 		if (build_mode == stedBuildMode_Debug) {
-			strcat(universal_cl_args, debug_args);
+			strcat(universal_cl_args, DEBUG_ARGS);
 		}
 	}
 
@@ -68,35 +64,22 @@ int main(int argc, char* argv[]) {
 	main_module = sbbsCreateModule("main");
 	sbbsAddModuleSource(main_module, "../src/main.c", universal_cl_args);
 
-	/* logging module */
-	log_module = sbbsCreateModule("log");
-	sbbsAddModuleSource(log_module, "../src/log.c", universal_cl_args);
-	sbbsAddModuleDependency(main_module, log_module);
+	/* general module; used in every build type */
+	general_module = sbbsCreateModule("general");
+	sbbsAddModuleSource(general_module, "../src/log.c", universal_cl_args);
+	sbbsAddModuleSource(general_module, "../src/file.c", universal_cl_args);
+	sbbsAddModuleSource(general_module, "../src/rope.c", universal_cl_args);
+	sbbsAddModuleDependency(main_module, general_module);
 
-	/* file module */
-	file_module = sbbsCreateModule("file");
-	sbbsAddModuleSource(file_module, "../src/file.c", universal_cl_args);
-	sbbsAddModuleDependency(main_module, file_module);
-
-	/* data structures */
-	rope_module = sbbsCreateModule("rope");
-	sbbsAddModuleSource(rope_module, "../src/rope.c", universal_cl_args);
-	sbbsAddModuleDependency(main_module, rope_module);
-
-	/* optional modules */
+	/* optional terminal module; right now this is forced */
+	terminal_module = sbbsCreateModule("terminal");
 	#ifdef __GLIBC__
-		tmp_module = sbbsCreateModule("glibc-terminal");
-		sbbsAddModuleSource(tmp_module, "../src/linux/terminal-input.c", universal_cl_args);
-		sbbsAddModuleSource(tmp_module, "../src/linux/terminal-output.c", universal_cl_args);
-		os_dependent_modules = stedAddModuleToNullTerminatedList(os_dependent_modules, tmp_module);
+		sbbsAddModuleSource(terminal_module, "../src/linux/terminal-input.c", universal_cl_args);
+		sbbsAddModuleSource(terminal_module, "../src/linux/terminal-output.c", universal_cl_args);
+		sbbsAddModuleDependency(main_module, terminal_module);
 	#else
 		#error "This platform is not supported by Sted. Please get in touch with the devs to see how long or if this platform will be supported"
 	#endif
-
-	/* make os dependent modules dependencies of the main module */
-	for (i = 0; os_dependent_modules[i] != NULL; i++) {
-		sbbsAddModuleDependency(main_module, os_dependent_modules[i]);
-	}
 
 	/* compile the program */
 	sbbsCompileModule(main_module);
@@ -107,27 +90,6 @@ int main(int argc, char* argv[]) {
 		free(universal_cl_args);
 	}
 	sbbsDestroyModule(main_module);
-	free(os_dependent_modules);
 
 	return 0;
-}
-
-size_t stedGetNullTerminatedModuleListLength(struct sbbsModule** list) {
-	size_t length = 0, i = 0;
-	for (i = 0; list[i] != NULL; i++) {
-		length++;
-	}
-	return length;
-}
-
-struct sbbsModule** stedAddModuleToNullTerminatedList(struct sbbsModule** list, struct sbbsModule* module) {
-	if (list == NULL) {
-		list = calloc(2, sizeof(struct sbbsModule*));
-		list[0] = module;
-		list[1] = NULL;
-	} else {
-		const size_t LIST_LEN = stedGetNullTerminatedModuleListLength(list) + 2;
-		list = realloc(list, LIST_LEN * sizeof(struct sbbsModule*));
-	}
-	return list;
 }
