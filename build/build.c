@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
 	struct sbbsModule* main_module = NULL;
 	struct sbbsModule* log_module = NULL;
 	struct sbbsModule* file_module = NULL;
+	struct sbbsModule* rope_module = NULL;
 	struct sbbsModule* tmp_module = NULL; /* use this any time that you'd like to */
 	char* universal_cl_args = NULL;
 	enum stedBuildMode build_mode;
@@ -76,6 +77,11 @@ int main(int argc, char* argv[]) {
 	file_module = sbbsCreateModule("file");
 	sbbsAddModuleSource(file_module, "../src/file.c", universal_cl_args);
 	sbbsAddModuleDependency(main_module, file_module);
+
+	/* data structures */
+	rope_module = sbbsCreateModule("rope");
+	sbbsAddModuleSource(rope_module, "../src/rope.c", universal_cl_args);
+	sbbsAddModuleDependency(main_module, rope_module);
 
 	/* optional modules */
 	#ifdef __GLIBC__
