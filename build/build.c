@@ -67,8 +67,7 @@ int main(int argc, char* argv[]) {
 	/* general module; used in every build type */
 	general_module = sbbsCreateModule("general");
 	sbbsAddModuleSource(general_module, "../src/log.c", universal_cl_args);
-	sbbsAddModuleSource(general_module, "../src/file.c", universal_cl_args);
-	sbbsAddModuleSource(general_module, "../src/rope.c", universal_cl_args);
+	sbbsAddModuleSource(general_module, "../src/string.c", universal_cl_args);
 	sbbsAddModuleDependency(main_module, general_module);
 
 	/* optional terminal module; right now this is forced */
