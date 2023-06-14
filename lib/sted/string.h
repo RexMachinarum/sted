@@ -1,6 +1,7 @@
 #ifndef EDITOR_STRING
 #define EDITOR_STRING
 
+#include <stdio.h>
 #include <stdlib.h>
 
 /* treat stedString and struct stedString* as opaque structs */
@@ -15,15 +16,15 @@ enum stedStringOffset {
 	stedStringOffset_Previous
 };
 
-extern struct stedString* stedFindStartOfString    (struct stedString* list);
-extern void               stedDestroyString        (struct stedString* list);
-extern struct stedString* stedCreateString         (void);
-extern void               stedAddToString          (struct stedString* list, const char to_add, enum stedStringOffset offset);
-extern void               stedRemoveFromString     (struct stedString* list);
-extern struct stedString* stedMakeStringFromFile   (const char* const filename);
-extern void               stedSaveStringToFile     (const struct stedString* list, const char* const filename);
-extern struct stedString* stedGetString            (struct stedString* list, size_t index);
-extern char               stedGetStringValue       (struct stedString* list, size_t index);
-extern size_t             stedGetStringLength      (struct stedString* list);
+extern struct stedString* stedFindStartOfString        (struct stedString* string);
+extern void               stedDestroyString            (struct stedString* string);
+extern struct stedString* stedCreateString             (void);
+extern void               stedAddToString              (struct stedString* string, const char to_add, enum stedStringOffset offset);
+extern void               stedRemoveFromString         (struct stedString* string);
+extern struct stedString* stedMakeStringFromFile       (const char* const filename);
+extern void               stedSaveStringToFile         (const struct stedString* string, const char* const filename);
+extern struct stedString* stedGetString                (struct stedString* string, size_t index);
+extern char               stedGetStringValue           (struct stedString* string, size_t index);
+extern size_t             stedGetStringLength          (struct stedString* string);
 
 #endif

@@ -4,16 +4,16 @@
 #include <stdlib.h>
 #include <assert.h>
 
-struct stedString* stedFindStartOfCharList(struct stedString* list) {
-	struct stedString* iter = list;
+struct stedString* stedFindStartOfCharList(struct stedString* string) {
+	struct stedString* iter = string;
 	while (iter->prev != NULL) {
 		iter = iter->prev;
 	}
 	return iter;
 }
 
-void stedDestroyString(struct stedString* list) {
-	struct stedString* iter = list;
+void stedDestroyString(struct stedString* string) {
+	struct stedString* iter = string;
 	while (iter != NULL) {
 		struct stedString* prev = iter;
 		iter = iter->next;
@@ -29,47 +29,47 @@ struct stedString* stedCreateString(void) {
 	return new;
 }
 
-void stedAddToString(struct stedString* list, const char to_add, enum stedStringOffset offset) {
+void stedAddToString(struct stedString* string, const char to_add, enum stedStringOffset offset) {
 	assert(offset != stedStringOffset_Current);
 	if (offset == stedStringOffset_Next) {
-		if (list->next == NULL && list->value == '\0') {
-			list->value = to_add;
-		} else if (list->next == NULL) {
-			list->next = malloc(sizeof(struct stedString));
-			list->next->next = NULL;
-			list->next->prev = list;
-			list->next->value = to_add;
+		if (string->next == NULL && string->value == '\0') {
+			string->value = to_add;
+		} else if (string->next == NULL) {
+			string->next = malloc(sizeof(struct stedString));
+			string->next->next = NULL;
+			string->next->prev = string;
+			string->next->value = to_add;
 		} else {
-			struct stedString* old_next = list->next;
-			list->next = malloc(sizeof(struct stedString));
-			list->next->next = old_next;
-			list->next->next->prev = list->next;
-			list->next->value = to_add;
-			list->next->prev = list;
+			struct stedString* old_next = string->next;
+			string->next = malloc(sizeof(struct stedString));
+			string->next->next = old_next;
+			string->next->next->prev = string->next;
+			string->next->value = to_add;
+			string->next->prev = string;
 		}
 	} else if (offset == stedStringOffset_Previous) {
-		if (list->prev == NULL && list->value == '\0') {
-			list->value = to_add;
-		} else if (list->prev == NULL) {
-			list->prev = malloc(sizeof(struct stedString));
-			list->prev->prev = NULL;
-			list->prev->next = list;
-			list->prev->value = to_add;
+		if (string->prev == NULL && string->value == '\0') {
+			string->value = to_add;
+		} else if (string->prev == NULL) {
+			string->prev = malloc(sizeof(struct stedString));
+			string->prev->prev = NULL;
+			string->prev->next = string;
+			string->prev->value = to_add;
 		} else {
-			struct stedString* old_prev = list->prev;
-			list->prev = malloc(sizeof(struct stedString));
-			list->prev->prev = old_prev;
-			list->prev->next = list;
-			list->prev->prev->next = list->prev;
-			list->prev->value = to_add;
+			struct stedString* old_prev = string->prev;
+			string->prev = malloc(sizeof(struct stedString));
+			string->prev->prev = old_prev;
+			string->prev->next = string;
+			string->prev->prev->next = string->prev;
+			string->prev->value = to_add;
 		}
 	}
 }
 
-void stedRemoveFromString(struct stedString* list) {
-	list->prev->next = list->next;
-	list->next->prev = list->prev;
-	free(list);
+void stedRemoveFromString(struct stedString* string) {
+	string->prev->next = string->next;
+	string->next->prev = string->prev;
+	free(string);
 }
 
 struct stedString* stedMakeStringFromFile(const char* const filename) {
@@ -103,20 +103,20 @@ struct stedString* stedMakeStringFromFile(const char* const filename) {
 	return new_list;
 }
 
-void stedSaveStringToFile(const struct stedString* list, const char* const filename) {
-	const struct stedString* iter = list;
+void stedSaveStringToFile(const struct stedString* string, const char* const filename) {
+	const struct stedString* iter = string;
 
 	FILE* file = fopen(filename, "w");
 	assert(file != NULL);
-	for (iter = list; iter != NULL; iter = iter->next) {
+	for (iter = string; iter != NULL; iter = iter->next) {
 		fputc(iter->value, file);
 	}
 	fclose(file);
 }
 
-struct stedString* stedGetString(struct stedString* list, size_t index) {
+struct stedString* stedGetString(struct stedString* string, size_t index) {
 	size_t i = 0;
-	struct stedString* iter = list;
+	struct stedString* iter = string;
 	for (i = 0; i < index; i++) {
 		if (iter == NULL) {
 			return NULL;
@@ -127,13 +127,13 @@ struct stedString* stedGetString(struct stedString* list, size_t index) {
 	return iter;
 }
 
-char stedGetStringValue(struct stedString* list, size_t index) {
-	return stedGetString(list, index)->value;
+char stedGetStringValue(struct stedString* string, size_t index) {
+	return stedGetString(string, index)->value;
 }
 
-size_t stedGetStringLength(struct stedString* list) {
+size_t stedGetStringLength(struct stedString* string) {
 	size_t length = 0;
-	struct stedString* iter = list;
+	struct stedString* iter = string;
 	while (iter != NULL) {
 		iter = iter->next;
 		length++;
