@@ -16,7 +16,7 @@ static int IsTTY() {
 
 void stedSetupTerminalDrawing(void) {
 	/* causes printing to only work when stdout is flushed */
-	setvbuf(stdout, NULL, _IOFBF, BUFSIZ);
+	setvbuf(stdout, NULL, _IOFBF, 0);
 	fputs("\e[2J\e[?1049h\e[?25l", stdout); /* clears the screen, enables alternate terminal buffer & makes cursor invisible */
 	fflush(stdout);
 }
