@@ -1,6 +1,10 @@
 #ifndef EDITOR_TERMINAL
 #define EDITOR_TERMINAL
 
+#include <stdlib.h>
+#include "string.h"
+#include "types.h"
+
 /* all of this stuff is for drawing */
 
 typedef unsigned short stedTermDimension;
@@ -30,26 +34,31 @@ extern stedTermDimension stedGetTerminalWidth       (void);
 extern stedTermDimension stedGetTerminalHeight      (void);
 extern void              stedClearTerminal          (void);
 extern void              stedDrawTerminal           (void);
-extern void              stedDrawCharacter          (stedTermDimension x, stedTermDimension y, const char to_draw, enum stedTerminalColor foreground_color, enum stedTerminalColor background_color, enum stedTerminalStyle style);
-extern void              stedDrawString             (stedTermDimension x, stedTermDimension y, const char* to_draw, enum stedTerminalColor foreground_color, enum stedTerminalColor background_color, enum stedTerminalStyle style);
+
+/* Drawing */
+
+extern void stedMoveTerminalCursorTo       (stedTermDimension pos_x, stedTermDimension pos_y);
+extern void stedSetTerminalStyle           (enum stedTerminalStyle style);
+extern void stedSetTerminalBackgroundColor (enum stedTerminalColor color);
+extern void stedSetTerminalForegroundColor (enum stedTerminalColor color);
+extern void stedDrawCharToTerminal         (char c);
+extern void stedDrawCStringToTerminal      (char* str);
 
 /* All the stuff below is for input processing */
 
-#include <stdlib.h>
-
-extern void             stedSetupTerminalInput    (void);
-extern void             stedCleanupTerminalInput  (void);
+extern void stedSetupTerminalInput   (void);
+extern void stedCleanupTerminalInput (void);
 /*
  * returns an array of character which represent the input that was recieved from the user.
  * 'len_ref' will be set to the length of this array.
  * You MUST free this memory.
 */
-extern int* stedGetTerminalInput      (size_t* const len_ref, const int wait_for_input);
+extern int* stedGetTerminalInput(size_t* const len_ref, bool wait_for_input);
 
 /*
  * These constants are helper values that are often returned from stedGetTerminalInput().
  * You should only assume that the alpha-numeric characters line up with their
- * ASCII counterparts. 
+ * ASCII counterparts.
  */
 
 /* TODO: add support for F1-12 keys ;) */

@@ -10,9 +10,13 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
+/* static functions */
+
 static int IsTTY() {
 	return isatty(fileno(stdout));
 }
+
+/* exported functions */
 
 void stedSetupTerminalDrawing(void) {
 	/* causes printing to only work when stdout is flushed */
@@ -44,33 +48,45 @@ stedTermDimension stedGetTerminalHeight(void) {
 
 void stedClearTerminal(void) {
 	fprintf(stdout, "\e[2J");
-	fflush(stdout);
 }
 
 void stedDrawTerminal(void) {
 	fflush(stdout);
 }
 
-void stedDrawCharacter(stedTermDimension x, stedTermDimension y, const char to_draw, enum stedTerminalColor foreground_color, enum stedTerminalColor background_color, enum stedTerminalStyle style) {
-	const short ansi_escape_code_foreground_color = foreground_color + 30;
-	const short ansi_escape_code_background_color = background_color + 40;
+/* TODO: add a draw pass system that allows the previously rendered frame 
+ * against the current frame that will be produced and only render the 
+ * differences between these two frames. This saves a lot of performance
+ * but the code is janky to implement (because it needs persistent state
+ * so I'll do that later)*/
+
+void stedMoveTerminalCursorTo       (stedTermDimension pos_x, stedTermDimension pos_y) {
+	fprintf(stdout, "\e[%d;%dH", pos_y, pos_x);
+}
+
+void stedSetTerminalStyle           (enum stedTerminalStyle style) {
 	if (style == stedTerminalStyle_BoldItalic) {
-		fputs("\e[1;3m", stdout);
-		fprintf(stdout, "\e[%d;%dH\e[%d;%dm%c", y, x, ansi_escape_code_foreground_color, ansi_escape_code_background_color, to_draw);
+		fputs("\e[1;3m]", stdout);
 	} else {
-		fprintf(stdout, "\e[%d;%dH\e[%d;%d;%dm%c", y, x, style, ansi_escape_code_foreground_color, ansi_escape_code_background_color, to_draw);
+		fprintf(stdout, "\e[%dm", style);
 	}
 }
 
-void stedDrawString(stedTermDimension x, stedTermDimension y, const char* to_draw, enum stedTerminalColor foreground_color, enum stedTerminalColor background_color, enum stedTerminalStyle style) {
-	const short ansi_escape_code_foreground_color = foreground_color + 30;
-	const short ansi_escape_code_background_color = background_color + 40;
-	if (style == stedTerminalStyle_BoldItalic) {
-		fputs("\e[1;3m", stdout);
-		fprintf(stdout, "\e[%d;%dH\e[%d;%dm%s", y, x, ansi_escape_code_foreground_color, ansi_escape_code_background_color, to_draw);
-	} else {
-		fprintf(stdout, "\e[%d;%dH\e[%d;%d;%d;%dm%s", y, x, ansi_escape_code_foreground_color, ansi_escape_code_background_color, ansi_escape_code_foreground_color, ansi_escape_code_background_color, to_draw);
-	}
+void stedSetTerminalBackgroundColor (enum stedTerminalColor color) {
+	fprintf(stdout, "\e[%dm", 40 + color);
 }
+
+void stedSetTerminalForegroundColor (enum stedTerminalColor color) {
+	fprintf(stdout, "\e[%dm", 30 + color);
+}
+
+void stedDrawCharToTerminal(char c) {
+	fputc(c, stdout);
+}
+
+void stedDrawCStringToTerminal(char* str) {
+	fputs(str, stdout);
+}
+
 
 #endif
