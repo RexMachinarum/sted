@@ -30,7 +30,7 @@ void stedCleanupTerminalInput (void) {
 	assert(tcsetattr(fileno(stdout), TCSAFLUSH, &original_termios) == 0);
 }
 
-int* stedGetTerminalInput(size_t* const len_ref, bool wait_for_input) {
+int* stedGetTerminalInput(size_t* const len_ref, const int wait_for_input) {
 	/* TODO: if the ESCAPE character is read in, it will wait a tiny bit before processing the input because it wants to know if the user is trying to type some kind of escape character. Fix this maybe? ;) No one else does this but it would be nice to be the first ;)))) */
 	int raw_input = '\0';
 	int* input = NULL;
